@@ -35,3 +35,55 @@ body {
 .katex-display > .katex {
   font-size: 1.1em;
 }
+
+/* Landing dot grid */
+.dot-grid {
+  background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.6;
+}
+
+.dot-fade {
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 40%, white 100%);
+}
+
+/* Landing entrance animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.landing-tag {
+  animation: fadeUp 0.5s ease both;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.landing-h1 {
+  animation: fadeUp 0.6s ease both;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.landing-cta {
+  animation: fadeUp 0.6s ease both;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.tableau-card {
+  animation: fadeUp 0.6s ease both;
+  opacity: 0;
+}
+
+.tableau-card:nth-child(1) { animation-delay: 0.1s; }
+.tableau-card:nth-child(3) { animation-delay: 0.25s; }
+
+.feature-card {
+  animation: fadeUp 0.5s ease both;
+  opacity: 0;
+}
+
+.feature-card:nth-child(1) { animation-delay: 0.05s; }
+.feature-card:nth-child(2) { animation-delay: 0.15s; }
+.feature-card:nth-child(3) { animation-delay: 0.25s; }
