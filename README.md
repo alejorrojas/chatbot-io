@@ -1,3 +1,30 @@
+<div align="center">
+  <img src="public/utn-logo.png" alt="UTN Logo" width="100" />
+
+  **Universidad Tecnológica Nacional**
+  Facultad Regional Resistencia
+
+  ---
+
+  **Nombre del grupo:** Los Opti-místicos
+
+  **Equipo Docente:**
+  Screpnik, Claudia · Vera, Jorge Ariel
+
+  | Integrante | Legajo | Rol |
+  |---|---|---|
+  | Aguirre Arteaga, Jaider Camilo | — | Equipo de desarrollo |
+  | Casano, Julieta | — | Equipo de producción |
+  | Dominguez, Bruno Ivan | 26.629 | Equipo de desarrollo |
+  | Rojas, Alejo Ivan | 27.316 | Scrum Master |
+  | Rodríguez Leiva, Juan Ignacio | 28.733 | Product Owner |
+  | Sotelo, María Celina | — | Equipo de testeo |
+
+  **CICLO LECTIVO 2026**
+</div>
+
+---
+
 # Simplex
 
 Un asistente de IA especializado en resolver problemas de programación lineal paso a paso con el método Simplex. Orientado a estudiantes universitarios — explica cada iteración, muestra las tablas en LaTeX y razona como un profesor.
