@@ -175,7 +175,7 @@ export function solveSimplex(input: LPInput): SimplexResult {
     iteration,
     colNames: [...allVars],
     basicVars: [...basicVars],
-    matrix: mat.map((row) => [...row]),
+    matrix: mat.map((row) => row.map(round)),
   });
 
   const tableaux: TableauSnapshot[] = [snap(0)];
