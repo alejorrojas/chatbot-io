@@ -3,7 +3,7 @@ import { openai } from '@ai-sdk/openai';
 import { simplexTool } from '@/app/tools/simplex';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export const maxDuration = 30;
+export const maxDuration = 300;
 
 const generateMessageId = createIdGenerator({ prefix: 'msg', size: 16 });
 
