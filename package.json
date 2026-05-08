@@ -13,13 +13,15 @@
     "@ai-sdk/react": "^3.0.172",
     "@tailwindcss/typography": "^0.5.19",
     "ai": "^6.0.170",
+    "javascript-lp-solver": "^1.0.3",
     "katex": "^0.16.45",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
