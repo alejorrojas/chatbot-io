@@ -1,35 +1,39 @@
 <div align="center">
   <img src="public/utn-logo.png" alt="UTN Logo" width="100" />
 
-  **Universidad Tecnológica Nacional**
-  Facultad Regional Resistencia
+  <h2>Universidad Tecnológica Nacional</h2>
+  <p>Facultad Regional Resistencia</p>
 
-  ---
+  <h1>Simplex</h1>
+  <p>Un asistente de IA especializado en resolver problemas de programación lineal paso a paso con el método Simplex. Orientado a estudiantes universitarios — explica cada iteración, muestra las tablas en LaTeX y razona como un profesor.</p>
 
-  **Nombre del grupo:** Los Opti-místicos
+  <a href="https://chatbot-io-omega.vercel.app/">https://chatbot-io-omega.vercel.app/</a>
 
-  **Equipo Docente:**
-  Screpnik, Claudia · Vera, Jorge Ariel
+  <br /><br />
+
+  <strong>Grupo:</strong> Los Opti-místicos
+
+  <br />
+
+  <strong>Equipo Docente:</strong> Screpnik, Claudia · Vera, Jorge Ariel
+
+  <br /><br />
 
   | Integrante | Legajo | Rol |
   |---|---|---|
-  | Aguirre Arteaga, Jaider Camilo | — | Equipo de desarrollo |
-  | Casano, Julieta | — | Equipo de producción |
+  | Aguirre Arteaga, Jaider Camilo | | Equipo de desarrollo |
+  | Casano, Julieta | | Equipo de producción |
   | Dominguez, Bruno Ivan | 26.629 | Equipo de desarrollo |
   | Rojas, Alejo Ivan | 27.316 | Scrum Master |
   | Rodríguez Leiva, Juan Ignacio | 28.733 | Product Owner |
-  | Sotelo, María Celina | — | Equipo de testeo |
+  | Sotelo, María Celina | | Equipo de testeo |
 
-  **CICLO LECTIVO 2026**
+  <br />
+
+  <strong>Ciclo Lectivo 2026</strong>
 </div>
 
----
-
-# Simplex
-
-Un asistente de IA especializado en resolver problemas de programación lineal paso a paso con el método Simplex. Orientado a estudiantes universitarios — explica cada iteración, muestra las tablas en LaTeX y razona como un profesor.
-
----
+<br />
 
 ## Stack
 
@@ -42,38 +46,6 @@ Un asistente de IA especializado en resolver problemas de programación lineal p
 | Math | KaTeX + react-markdown |
 | Package manager | Bun |
 
----
-
-## Cómo correr localmente
-
-```bash
-# 1. Instalar dependencias
-bun install
-
-# 2. Configurar variables de entorno
-cp .env.example .env.local
-# Completar con tus claves (ver sección de variables más abajo)
-
-# 3. Levantar el servidor
-bun dev
-```
-
-Abre [http://localhost:3000](http://localhost:3000).
-
----
-
-## Variables de entorno
-
-```bash
-# .env.local
-NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-SUPABASE_SECRET_KEY=sb_secret_...
-OPENAI_API_KEY=sk-proj-...
-```
-
----
-
 ## Funcionalidades
 
 - **Login / Signup** — autenticación por email y contraseña. El signup es inmediato (sin confirmación de email).
@@ -84,7 +56,24 @@ OPENAI_API_KEY=sk-proj-...
 - **Explicación pedagógica** — el modelo usa los tableaux del solver para explicar cada iteración: variable entrante, variable saliente, pivote y operaciones elementales.
 - **Render LaTeX** — las tablas Simplex se muestran en formato matemático usando KaTeX.
 
----
+## Cómo correr localmente
+
+```bash
+bun install
+cp .env.example .env.local
+bun dev
+```
+
+Abre [http://localhost:3000](http://localhost:3000).
+
+## Variables de entorno
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+SUPABASE_SECRET_KEY=sb_secret_...
+OPENAI_API_KEY=sk-proj-...
+```
 
 ## Estructura del proyecto
 
@@ -96,14 +85,11 @@ app/
   login/             → Formulario de login/signup
   components/        → Chat, Sidebar, DotGrid, Icons
   tools/simplex.ts   → Implementación del método Simplex
-  opengraph-image.tsx → OG image generada con código
 
 lib/supabase/        → Clientes SSR y browser de Supabase
 migrations/          → SQL de migraciones de base de datos
 proxy.ts             → Protección de rutas + refresh de sesión
 ```
-
----
 
 ## Base de datos
 
@@ -114,23 +100,9 @@ messages  → id, chat_id, role, parts (JSONB), created_at, order
 
 RLS activado: cada usuario solo accede a sus propios datos.
 
----
-
-## Cómo funciona la autenticación
-
-Usa `@supabase/ssr` con **publishable key** (no anon key). El `proxy.ts` corre en cada request, refresca la sesión y redirige a `/login` si no hay usuario autenticado en rutas `/chat/*`.
-
----
-
 ## Limitaciones del solver
 
 - Variables de decisión deben ser no negativas (x ≥ 0)
 - No maneja variables libres
 - RHS negativo en restricciones no soportado
 - Sin prevención de ciclado (Bland's rule)
-
----
-
-## Licencia
-
-Privado.
