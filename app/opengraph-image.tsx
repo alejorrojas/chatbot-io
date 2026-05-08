@@ -17,20 +17,20 @@ export default function Image() {
           backgroundSize: '28px 28px',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '72px 80px',
+          justifyContent: 'center',
+          padding: '80px 96px',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Bottom fade — softens dot grid like the landing page */}
+        {/* Bottom fade */}
         <div
           style={{
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            height: '280px',
+            height: '260px',
             background: 'linear-gradient(to bottom, transparent, #ffffff)',
             display: 'flex',
           }}
@@ -42,23 +42,48 @@ export default function Image() {
             top: 0,
             right: 0,
             bottom: 0,
-            width: '200px',
+            width: '180px',
             background: 'linear-gradient(to right, transparent, #ffffff)',
             display: 'flex',
           }}
         />
 
-        {/* Top: badge */}
+        {/* Title */}
+        <span
+          style={{
+            fontSize: '72px',
+            fontWeight: 800,
+            color: '#09090b',
+            fontFamily: 'monospace',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+          }}
+        >
+          Simplex — Programación Lineal
+        </span>
+
+        {/* Subtitle */}
+        <span
+          style={{
+            fontSize: '30px',
+            color: '#71717a',
+            fontFamily: 'sans-serif',
+            marginTop: '24px',
+            lineHeight: 1.4,
+          }}
+        >
+          Un asistente de IA que resuelve tus problemas paso a paso, solo con Simplex.
+        </span>
+
+        {/* Wordmark bottom-left */}
         <div
           style={{
+            position: 'absolute',
+            bottom: '64px',
+            left: '96px',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            backgroundColor: '#ffffff',
-            border: '1.5px solid #e4e4e7',
-            borderRadius: '999px',
-            padding: '8px 18px',
-            width: 'fit-content',
           }}
         >
           <div
@@ -67,78 +92,16 @@ export default function Image() {
               height: '10px',
               borderRadius: '50%',
               backgroundColor: '#10b981',
+              display: 'flex',
             }}
           />
           <span
             style={{
-              fontSize: '16px',
-              color: '#71717a',
-              fontFamily: 'monospace',
-              letterSpacing: '0.06em',
-            }}
-          >
-            Método Simplex · Paso a paso
-          </span>
-        </div>
-
-        {/* Center: hero heading */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', marginTop: '-20px' }}>
-          <span
-            style={{
-              fontSize: '128px',
-              fontWeight: 900,
-              color: '#09090b',
-              lineHeight: '0.88',
-              fontFamily: 'monospace',
-              letterSpacing: '-0.03em',
-            }}
-          >
-            Programación
-          </span>
-          <span
-            style={{
-              fontSize: '128px',
-              fontWeight: 900,
-              color: '#09090b',
-              lineHeight: '0.88',
-              fontFamily: 'monospace',
-              letterSpacing: '-0.03em',
-            }}
-          >
-            Lineal.
-          </span>
-          <span
-            style={{
-              fontSize: '26px',
-              color: '#a1a1aa',
-              marginTop: '28px',
-              maxWidth: '620px',
-              lineHeight: '1.45',
-              fontFamily: 'sans-serif',
-            }}
-          >
-            Un asistente de IA que resuelve tus problemas paso a paso, solo con Simplex.
-          </span>
-        </div>
-
-        {/* Bottom: wordmark */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Mini simplex graph from the icon concept */}
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <line x1="4" y1="32" x2="4" y2="4" stroke="#09090b" strokeWidth="2" strokeLinecap="round" />
-            <line x1="4" y1="32" x2="32" y2="32" stroke="#09090b" strokeWidth="2" strokeLinecap="round" />
-            <line x1="6" y1="8" x2="30" y2="30" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
-            <circle cx="6" cy="8" r="3" fill="#10b981" />
-            <circle cx="18" cy="20" r="3" fill="#10b981" />
-            <circle cx="30" cy="30" r="3" fill="#10b981" />
-          </svg>
-          <span
-            style={{
-              fontSize: '22px',
+              fontSize: '20px',
               fontWeight: 700,
               color: '#09090b',
               fontFamily: 'monospace',
-              letterSpacing: '0.22em',
+              letterSpacing: '0.2em',
               textTransform: 'uppercase',
             }}
           >
