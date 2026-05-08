@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { IconGear, IconSend } from './icons';
+import { IconBot, IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
 function preprocessLatex(text: string): string {
