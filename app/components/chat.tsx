@@ -173,7 +173,7 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
           </div>
         )}
         {text && isStreaming && (
-          <span className="text-zinc-400 dark:text-zinc-500 text-xs italic not-prose">Generando respuesta…</span>
+          <span className="whitespace-pre-wrap">{text}</span>
         )}
         {text && !isStreaming && (
           <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
