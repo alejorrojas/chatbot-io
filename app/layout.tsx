@@ -15,6 +15,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Simplex",
   description: "Resuelve problemas de programación lineal paso a paso con el método Simplex",
+  openGraph: {
+    title: "Simplex — Programación Lineal",
+    description: "Un asistente de IA que resuelve tus problemas paso a paso, solo con Simplex.",
+    siteName: "Simplex",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Simplex — Programación Lineal",
+    description: "Un asistente de IA que resuelve tus problemas paso a paso, solo con Simplex.",
+  },
 };
 
 export default function RootLayout({
