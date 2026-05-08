@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { IconBot, IconSend } from './icons';
+import { IconBot, IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
 function preprocessLatex(text: string): string {
@@ -75,9 +75,11 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
           </div>
         ) : (
           <div className="flex flex-col gap-6 max-w-2xl mx-auto px-4">
-            {messages.map(message => (
-              <MessageItem key={message.id} message={message} />
-            ))}
+            {messages.map((message, i) => {
+              const isLast = i === messages.length - 1;
+              const isActiveAssistant = isLast && message.role === 'assistant' && (status === 'streaming' || status === 'submitted');
+              return <MessageItem key={message.id} message={message} isStreaming={isActiveAssistant} />;
+            })}
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -115,15 +117,31 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
   );
 }
 
-type MessagePart = { type: string; text?: string };
+type ToolState = 'partial-call' | 'call' | 'result';
+type MessagePart =
+  | { type: 'text'; text: string }
+  | { type: 'reasoning'; reasoning: string }
+  | { type: 'tool-invocation'; toolInvocation: { state: ToolState; toolCallId: string; toolName: string; args: unknown; result?: unknown } }
+  | { type: string; text?: string };
 type Message = { id: string; role: string; parts: MessagePart[] };
 
-function MessageItem({ message }: { message: Message }) {
+function MessageItem({ message, isStreaming }: { message: Message; isStreaming?: boolean }) {
   const isUser = message.role === 'user';
   const text = message.parts
-    .filter(p => p.type === 'text')
+    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
     .map(p => p.text)
     .join('');
+
+  const toolParts = message.parts.filter(
+    (p): p is { type: 'tool-invocation'; toolInvocation: { state: ToolState; toolCallId: string; toolName: string; args: unknown; result?: unknown } } =>
+      p.type === 'tool-invocation'
+  );
+  const activeTool = toolParts.find(
+    p => p.toolInvocation.state === 'call' || p.toolInvocation.state === 'partial-call'
+  );
+
+  const showThinking = isStreaming && !text && !activeTool;
+  const showToolRunning = !!activeTool;
 
   if (isUser) {
     return (
@@ -141,9 +159,27 @@ function MessageItem({ message }: { message: Message }) {
         <IconBot className="text-zinc-500 w-4 h-4" />
       </div>
       <div className="flex-1 text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 prose prose-sm dark:prose-invert max-w-none prose-code:before:content-none prose-code:after:content-none">
-        <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-          {preprocessLatex(text)}
-        </ReactMarkdown>
+        {showThinking && (
+          <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 not-prose">
+            <span className="text-sm">Thinking</span>
+            <span className="flex gap-0.5">
+              <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" />
+            </span>
+          </div>
+        )}
+        {showToolRunning && (
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 not-prose mb-3">
+            <IconGear className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
+            <span className="text-xs font-medium">Ejecutando algoritmo Simplex</span>
+          </div>
+        )}
+        {text && (
+          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+            {preprocessLatex(text)}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   );
