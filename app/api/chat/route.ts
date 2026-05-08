@@ -25,6 +25,9 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: openai('gpt-5.5'),
+    providerOptions: {
+      openai: { reasoningEffort: 'low' },
+    },
     system: `Eres un asistente de programación lineal con enfoque universitario. Tu propósito es que el estudiante entienda el método Simplex a fondo, no solo obtener la respuesta.
 
 MÉTODO:
