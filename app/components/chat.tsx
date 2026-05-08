@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { IconBot, IconGear, IconSend } from './icons';
+import { IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
 function preprocessLatex(text: string): string {
@@ -155,9 +155,6 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
 
   return (
     <div className="flex gap-3 items-start">
-      <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <IconBot className="text-zinc-500 w-4 h-4" />
-      </div>
       <div className="flex-1 text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 prose prose-sm dark:prose-invert max-w-none prose-code:before:content-none prose-code:after:content-none">
         {showThinking && (
           <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 not-prose">
@@ -175,7 +172,10 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
             <span className="text-xs font-medium">Ejecutando algoritmo Simplex</span>
           </div>
         )}
-        {text && (
+        {text && isStreaming && (
+          <span className="text-zinc-400 dark:text-zinc-500 text-xs italic not-prose">Generando respuesta…</span>
+        )}
+        {text && !isStreaming && (
           <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
             {preprocessLatex(text)}
           </ReactMarkdown>
