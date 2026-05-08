@@ -60,10 +60,10 @@ export default function LandingPage() {
             Simplex
           </span>
           <Link
-            href="/chat"
+            href="/login"
             className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
           >
-            Abrir chat →
+            Iniciar sesión →
           </Link>
         </div>
       </nav>
@@ -89,7 +89,7 @@ export default function LandingPage() {
 
           <div className="landing-cta flex items-center gap-4 mt-10">
             <Link
-              href="/chat"
+              href="/login"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-zinc-950 text-white text-sm font-medium hover:bg-zinc-700 transition-colors"
             >
               Comenzar ahora
@@ -97,7 +97,6 @@ export default function LandingPage() {
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
             </Link>
-            <span className="text-sm text-zinc-400">Sin registro · Gratis</span>
           </div>
         </div>
       </section>
@@ -165,10 +164,10 @@ export default function LandingPage() {
             Solo describí el problema y el método Simplex hace el resto.
           </p>
           <Link
-            href="/chat"
+            href="/login"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-zinc-950 text-sm font-semibold hover:bg-zinc-100 transition-colors"
           >
-            Iniciar chat gratuito
+            Iniciar sesión
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>

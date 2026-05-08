@@ -3,19 +3,16 @@
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { useRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { IconBot, IconSend } from './icons';
+import type { UIMessage } from 'ai';
 
-// Models often output [ ... ] or \[ ... \] as display math delimiters.
-// remark-math only understands $...$ and $$...$$, so we normalize first.
 function preprocessLatex(text: string): string {
-  // \[...\] → $$...$$
   text = text.replace(/\\\[([\s\S]*?)\\\]/g, (_, m) => `$$\n${normalizeDisplayMath(m.trim())}\n$$`);
-  // \(...\) → $...$
   text = text.replace(/\\\(([\s\S]*?)\\\)/g, (_, m) => `$${m.trim()}$`);
-  // [ latex ] → $$...$$ only when the content looks like LaTeX
   text = text.replace(/\[ ([^\n[\]]+) \]/g, (match, m) => {
     if (/\\[a-zA-Z]|[_^]/.test(m)) return `$$\n${normalizeDisplayMath(m.trim())}\n$$`;
     return match;
@@ -23,17 +20,25 @@ function preprocessLatex(text: string): string {
   return text;
 }
 
-// Add \displaystyle inside array environments so \frac renders full-size
 function normalizeDisplayMath(math: string): string {
-  if (/\\begin\{array\}/.test(math)) {
-    return `\\displaystyle ${math}`;
-  }
+  if (/\\begin\{array\}/.test(math)) return `\\displaystyle ${math}`;
   return math;
 }
 
-export function Chat() {
+interface ChatProps {
+  id: string;
+  initialMessages?: UIMessage[];
+}
+
+export function Chat({ id, initialMessages = [] }: ChatProps) {
+  const router = useRouter();
   const { messages, sendMessage, status } = useChat({
+    id,
+    messages: initialMessages,
     transport: new DefaultChatTransport({ api: '/api/chat' }),
+    onFinish: () => {
+      router.refresh();
+    },
   });
 
   const [input, setInput] = useState('');
@@ -60,7 +65,6 @@ export function Chat() {
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto py-6">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-zinc-400">
@@ -79,7 +83,6 @@ export function Chat() {
         )}
       </div>
 
-      {/* Input */}
       <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-4">
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
           <div className="relative flex flex-col rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm focus-within:border-zinc-400 dark:focus-within:border-zinc-500 transition-colors">
