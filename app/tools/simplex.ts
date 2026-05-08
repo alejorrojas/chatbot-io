@@ -44,6 +44,9 @@ const PIVOT_TOL = 1e-9;
 const ZERO_TOL = 1e-10;
 const FEASIBILITY_TOL = 1e-6;
 const MAX_ITERATIONS = 200;
+const ROUND_DECIMALS = 4;
+
+const round = (v: number) => Math.round(v * 10 ** ROUND_DECIMALS) / 10 ** ROUND_DECIMALS;
 
 /**
  * Solves a linear programming problem using the Big-M Simplex method.
@@ -241,13 +244,13 @@ export function solveSimplex(input: LPInput): SimplexResult {
   );
   for (let i = 0; i < m; i++) {
     const bv = basicVars[i];
-    if (bv in variables) variables[bv] = Math.max(0, mat[i][n]);
+    if (bv in variables) variables[bv] = round(Math.max(0, mat[i][n]));
   }
 
   // mat[m][n] accumulates Z (the value being maximized)
   // For max: optimal = mat[m][n]
   // For min: we maximized −c·x, so optimal = −mat[m][n]
-  const optimal = opType === 'max' ? mat[m][n] : -mat[m][n];
+  const optimal = round(opType === 'max' ? mat[m][n] : -mat[m][n]);
 
   return { feasible: true, bounded: true, optimal, variables, tableaux };
 }
