@@ -11,6 +11,8 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.54",
     "@ai-sdk/react": "^3.0.172",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/typography": "^0.5.19",
     "ai": "^6.0.170",
     "javascript-lp-solver": "^1.0.3",
