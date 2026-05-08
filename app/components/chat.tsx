@@ -10,6 +10,14 @@ import rehypeKatex from 'rehype-katex';
 import { IconBot, IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
+function stripDisplayMath(text: string): string {
+  // Replace complete $$...$$ blocks (the Simplex tableaux) with a lightweight placeholder
+  let result = text.replace(/\$\$([\s\S]*?)\$\$/g, '\n*— tabla Simplex —*\n');
+  // If there's an unclosed $$ at the end (still streaming), remove it too
+  result = result.replace(/\$\$[\s\S]*$/, '');
+  return result;
+}
+
 function preprocessLatex(text: string): string {
   text = text.replace(/\\\[([\s\S]*?)\\\]/g, (_, m) => `$$\n${normalizeDisplayMath(m.trim())}\n$$`);
   text = text.replace(/\\\(([\s\S]*?)\\\)/g, (_, m) => `$${m.trim()}$`);
@@ -173,7 +181,9 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
           </div>
         )}
         {text && isStreaming && (
-          <span className="whitespace-pre-wrap">{text}</span>
+          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+            {stripDisplayMath(preprocessLatex(text))}
+          </ReactMarkdown>
         )}
         {text && !isStreaming && (
           <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
