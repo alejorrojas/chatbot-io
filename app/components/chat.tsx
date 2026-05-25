@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { IconBot, IconGear, IconSend } from './icons';
+import { SimplexTableau, splitLatexContent } from './simplex-tableau';
 import type { UIMessage } from 'ai';
 
 function stripUnclosedMath(text: string): string {
@@ -27,7 +28,6 @@ function preprocessLatex(text: string): string {
 }
 
 function normalizeDisplayMath(math: string): string {
-  if (/\\begin\{array\}/.test(math)) return `\\displaystyle ${math}`;
   return math;
 }
 
@@ -237,9 +237,15 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
           </ReactMarkdown>
         )}
         {text && !isStreaming && (
-          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]} components={markdownComponents}>
-            {preprocessLatex(text)}
-          </ReactMarkdown>
+          splitLatexContent(preprocessLatex(text)).map((seg, i) =>
+            seg.type === 'array' ? (
+              <SimplexTableau key={i} latex={seg.latex} />
+            ) : (
+              <ReactMarkdown key={i} remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]} components={markdownComponents}>
+                {seg.content}
+              </ReactMarkdown>
+            )
+          )
         )}
       </div>
     </div>
