@@ -65,7 +65,7 @@ ESTILO PEDAGÓGICO:
       {
         role: 'user',
         content: [
-          { type: 'file', data: tahaPdf, mimeType: 'application/pdf' },
+          { type: 'file', data: tahaPdf, mediaType: 'application/pdf' },
           { type: 'text', text: 'Este es el Capítulo 3 de "Investigación de Operaciones" de Taha (9ª ed.). Úsalo como fuente primaria para todas tus respuestas sobre el método Simplex.' },
         ],
       },
