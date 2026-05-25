@@ -10,12 +10,10 @@ import rehypeKatex from 'rehype-katex';
 import { IconBot, IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
-function stripDisplayMath(text: string): string {
-  // Replace complete $$...$$ blocks (the Simplex tableaux) with a lightweight placeholder
-  let result = text.replace(/\$\$([\s\S]*?)\$\$/g, '\n*— tabla Simplex —*\n');
-  // If there's an unclosed $$ at the end (still streaming), remove it too
-  result = result.replace(/\$\$[\s\S]*$/, '');
-  return result;
+function stripUnclosedMath(text: string): string {
+  // Only strip an unclosed $$ block at the very end (partial block still being streamed)
+  // Complete $$...$$ pairs render fine, including array environments
+  return text.replace(/\$\$(?![\s\S]*?\$\$)[\s\S]*$/, '');
 }
 
 function preprocessLatex(text: string): string {
@@ -164,6 +162,20 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
   );
 }
 
+const markdownComponents = {
+  // Wrap display math blocks in a scrollable styled container
+  div: ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+    if (className?.includes('math-display')) {
+      return (
+        <div className="not-prose overflow-x-auto my-4 px-5 py-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700">
+          <div className={className} {...props}>{children}</div>
+        </div>
+      );
+    }
+    return <div className={className} {...props}>{children}</div>;
+  },
+};
+
 type ToolState = 'partial-call' | 'call' | 'result';
 type MessagePart =
   | { type: 'text'; text: string }
@@ -220,12 +232,12 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
           </div>
         )}
         {text && isStreaming && (
-          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {stripDisplayMath(preprocessLatex(text))}
+          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]} components={markdownComponents}>
+            {stripUnclosedMath(preprocessLatex(text))}
           </ReactMarkdown>
         )}
         {text && !isStreaming && (
-          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]} components={markdownComponents}>
             {preprocessLatex(text)}
           </ReactMarkdown>
         )}
