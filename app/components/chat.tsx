@@ -71,55 +71,94 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
     }
   }
 
+  const isEmpty = messages.length === 0;
+
+  const suggestions = [
+    '¿Qué es el método Simplex?',
+    '¿Cómo identifico la solución óptima?',
+    '¿Qué son las variables de holgura?',
+    '¿Cuándo hay solución no acotada?',
+  ];
+
+  const inputForm = (
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto w-full">
+      <div className="relative flex flex-col rounded-2xl bg-white dark:bg-zinc-900 shadow-sm border border-white transition-colors">
+        <textarea
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Pregunta algo sobre el método Simplex..."
+          rows={1}
+          disabled={status !== 'ready'}
+          className="resize-none bg-transparent px-4 pt-3 pb-2 text-sm outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-zinc-900 dark:text-zinc-100 min-h-[44px] max-h-40 overflow-y-auto"
+        />
+        <div className="flex items-center justify-between px-3 pb-2">
+          <span className="flex items-center text-xs text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-800 rounded-full px-2.5 py-1 border border-zinc-200 dark:border-zinc-700">
+            GPT-5.5
+          </span>
+          <button
+            type="submit"
+            disabled={!input.trim() || status !== 'ready'}
+            className="w-7 h-7 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
+          >
+            <IconSend className="text-white dark:text-zinc-900 w-3 h-3 cursor-pointer" />
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+
+  if (isEmpty) {
+    return (
+      <div className="relative flex flex-col flex-1 h-full items-center justify-center px-4 overflow-hidden">
+        <div className="absolute w-[600px] h-[360px] rounded-full bg-blue-200/60 dark:bg-blue-500/20 blur-[80px] pointer-events-none" />
+        <h1 className="relative text-xl font-medium text-zinc-800 dark:text-zinc-200 mb-6">
+          ¿Qué problema quieres resolver hoy con Simplex?
+        </h1>
+        <div className="relative w-full max-w-2xl">
+          {inputForm}
+          <div className="flex flex-wrap gap-2 mt-4 justify-center">
+            {suggestions.map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => { sendMessage({ text: s }); setInput(''); }}
+                className="cursor-pointer text-xs px-3.5 py-2 rounded-xl shadow-sm dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto py-6">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-zinc-400">
-            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-              <IconBot className="text-zinc-500" />
+        <div className="flex flex-col gap-6 max-w-2xl mx-auto px-4">
+          {messages.map((message, i) => {
+            const isLast = i === messages.length - 1;
+            const isActiveAssistant = isLast && message.role === 'assistant' && (status === 'streaming' || status === 'submitted');
+            return <MessageItem key={message.id} message={message} isStreaming={isActiveAssistant} />;
+          })}
+          {status === 'submitted' && messages[messages.length - 1]?.role === 'user' && (
+            <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500">
+              <span className="text-sm">Thinking</span>
+              <span className="flex gap-0.5">
+                <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" />
+              </span>
             </div>
-            <p className="text-sm">¿En qué problema de programación lineal puedo ayudarte?</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-6 max-w-2xl mx-auto px-4">
-            {messages.map((message, i) => {
-              const isLast = i === messages.length - 1;
-              const isActiveAssistant = isLast && message.role === 'assistant' && (status === 'streaming' || status === 'submitted');
-              return <MessageItem key={message.id} message={message} isStreaming={isActiveAssistant} />;
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-4">
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-          <div className="relative flex flex-col rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm focus-within:border-zinc-400 dark:focus-within:border-zinc-500 transition-colors">
-            <textarea
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask anything..."
-              rows={1}
-              disabled={status !== 'ready'}
-              className="resize-none bg-transparent px-4 pt-3 pb-2 text-sm outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-zinc-900 dark:text-zinc-100 min-h-[44px] max-h-40 overflow-y-auto"
-            />
-            <div className="flex items-center justify-between px-3 pb-2">
-              <span className="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-800 rounded-full px-2.5 py-1 border border-zinc-200 dark:border-zinc-700">
-                <IconBot className="w-3 h-3" />
-                GPT-5.5
-              </span>
-              <button
-                type="submit"
-                disabled={!input.trim() || status !== 'ready'}
-                className="w-7 h-7 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
-              >
-                <IconSend className="text-white dark:text-zinc-900 w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </form>
+        {inputForm}
       </div>
     </div>
   );
