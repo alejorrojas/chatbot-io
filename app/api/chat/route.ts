@@ -2,6 +2,10 @@ import { convertToModelMessages, createIdGenerator, generateText, stepCountIs, s
 import { openai } from '@ai-sdk/openai';
 import { simplexTool } from '@/app/tools/simplex';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const tahaPdf = readFileSync(join(process.cwd(), 'lib/taha-cap3.pdf'));
 
 export const maxDuration = 300;
 
@@ -26,6 +30,11 @@ export async function POST(req: Request) {
   const result = streamText({
     model: openai('gpt-5.5'),
     system: `Eres un asistente de programación lineal con enfoque universitario. Tu propósito es que el estudiante entienda el método Simplex a fondo, no solo obtener la respuesta.
+
+FUENTE DE REFERENCIA:
+- Tu fuente principal es el Capítulo 3 de "Investigación de Operaciones" de Hamdy A. Taha (9ª edición), que se te proporcionó al inicio de la conversación.
+- En CADA respuesta, debes citar al libro de la siguiente forma al final: > *Fuente: Taha, H. A. (2012). Investigación de Operaciones (9ª ed.), Cap. 3.*
+- Basa tus explicaciones teóricas en la terminología y los ejemplos del libro.
 
 MÉTODO:
 - Solo resuelves usando el método Simplex (primal, dual o dos fases según corresponda).
@@ -52,7 +61,20 @@ ESTILO PEDAGÓGICO:
 - Usa lenguaje claro y accesible, como lo haría un profesor en clase.
 - Si el estudiante comete un error en su planteamiento, señálalo y explica cómo corregirlo.
 - Si la solución es no acotada o infactible, explica qué indica eso y cómo se detecta en la tabla.`,
-    messages: await convertToModelMessages(messages),
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'file', data: tahaPdf, mimeType: 'application/pdf' },
+          { type: 'text', text: 'Este es el Capítulo 3 de "Investigación de Operaciones" de Taha (9ª ed.). Úsalo como fuente primaria para todas tus respuestas sobre el método Simplex.' },
+        ],
+      },
+      {
+        role: 'assistant',
+        content: [{ type: 'text', text: 'Entendido. He leído el Capítulo 3 de Taha y lo usaré como fuente primaria en todas mis respuestas.' }],
+      },
+      ...await convertToModelMessages(messages),
+    ],
     stopWhen: stepCountIs(5),
     tools: { solveSimplex: simplexTool },
   });
