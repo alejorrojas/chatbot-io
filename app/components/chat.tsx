@@ -164,12 +164,11 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
   );
 }
 
-type ToolState = 'partial-call' | 'call' | 'result';
+type ToolState = 'input-streaming' | 'input-available' | 'output-available' | 'output-error';
 type MessagePart =
-  | { type: 'text'; text: string }
-  | { type: 'reasoning'; reasoning: string }
-  | { type: 'tool-invocation'; toolInvocation: { state: ToolState; toolCallId: string; toolName: string; args: unknown; result?: unknown } }
-  | { type: string; text?: string };
+  | { type: 'text'; text: string; state?: 'streaming' | 'done' }
+  | { type: 'reasoning'; text: string; state?: 'streaming' | 'done' }
+  | { type: string; toolCallId?: string; toolName?: string; state?: ToolState; input?: unknown; output?: unknown };
 type Message = { id: string; role: string; parts: MessagePart[] };
 
 function MessageItem({ message, isStreaming }: { message: Message; isStreaming?: boolean }) {
@@ -179,15 +178,18 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
     .map(p => p.text)
     .join('');
 
-  const toolParts = message.parts.filter(
-    (p): p is { type: 'tool-invocation'; toolInvocation: { state: ToolState; toolCallId: string; toolName: string; args: unknown; result?: unknown } } =>
-      p.type === 'tool-invocation'
-  );
-  const activeTool = toolParts.find(
-    p => p.toolInvocation.state === 'call' || p.toolInvocation.state === 'partial-call'
+  const reasoningText = message.parts
+    .filter((p): p is { type: 'reasoning'; text: string } => p.type === 'reasoning')
+    .map(p => p.text)
+    .join('');
+
+  const activeTool = message.parts.find(
+    p => (p.type.startsWith('tool-') || p.type === 'dynamic-tool') &&
+         (p.state === 'input-streaming' || p.state === 'input-available')
   );
 
-  const showThinking = isStreaming && !text && !activeTool;
+  const showThinkingDots = isStreaming && !text && !activeTool && !reasoningText;
+  const showReasoning = isStreaming && !!reasoningText && !activeTool && !text;
   const showToolRunning = !!activeTool;
 
   if (isUser) {
@@ -203,7 +205,7 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
   return (
     <div className="flex gap-3 items-start">
       <div className="flex-1 text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 prose prose-sm dark:prose-invert max-w-none prose-code:before:content-none prose-code:after:content-none">
-        {showThinking && (
+        {showThinkingDots && (
           <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 not-prose">
             <span className="text-sm">Thinking</span>
             <span className="flex gap-0.5">
@@ -213,10 +215,21 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
             </span>
           </div>
         )}
+        {showReasoning && (
+          <div className="not-prose mb-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 px-3.5 py-2.5">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-pulse" />
+              <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wide">Pensando</span>
+            </div>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 italic leading-relaxed line-clamp-4">
+              {reasoningText}
+            </p>
+          </div>
+        )}
         {showToolRunning && (
           <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 not-prose mb-3">
             <IconGear className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
-            <span className="text-xs font-medium">Ejecutando algoritmo Simplex</span>
+            <span className="text-xs font-medium">Resolviendo el problema con Simplex...</span>
           </div>
         )}
         {text && isStreaming && (
