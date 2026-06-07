@@ -10,10 +10,17 @@ import rehypeKatex from 'rehype-katex';
 import { IconBot, IconGear, IconSend } from './icons';
 import type { UIMessage } from 'ai';
 
+function isTableExpression(math: string): boolean {
+  return /\\begin\{(array|tabular|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}/.test(math);
+}
+
 function stripDisplayMath(text: string): string {
-  // Replace complete $$...$$ blocks (the Simplex tableaux) with a lightweight placeholder
-  let result = text.replace(/\$\$([\s\S]*?)\$\$/g, '\n*— tabla Simplex —*\n');
-  // If there's an unclosed $$ at the end (still streaming), remove it too
+  // Only replace complete $$...$$ blocks that are table/matrix expressions with a placeholder
+  let result = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, inner) => {
+    if (isTableExpression(inner)) return '\n*— tabla Simplex —*\n';
+    return match;
+  });
+  // Strip any unclosed $$ at the end (incomplete block still streaming)
   result = result.replace(/\$\$[\s\S]*$/, '');
   return result;
 }
