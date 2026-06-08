@@ -110,11 +110,13 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
 
     try {
       const fileParts = await Promise.all(pendingImages.map(uploadPendingImage));
-      const textPart = { type: 'text' as const, text: trimmed || 'Analiza la imagen adjunta.' };
+      const parts = trimmed
+        ? [...fileParts, { type: 'text' as const, text: trimmed }]
+        : fileParts;
 
       sendMessage({
         role: 'user',
-        parts: [...fileParts, textPart],
+        parts,
       });
 
       pendingImages.forEach(image => URL.revokeObjectURL(image.previewUrl));
@@ -358,22 +360,22 @@ function MessageItem({ message, isStreaming }: { message: Message; isStreaming?:
 
   if (isUser) {
     return (
-      <div className="flex justify-end">
-        <div className="max-w-[80%] rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2.5 text-sm leading-relaxed">
+      <div className="flex w-full justify-end">
+        <div className="ml-auto max-w-[80%] rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2.5 text-sm leading-relaxed">
           {imageParts.length > 0 && (
-            <div className="mb-2 grid grid-cols-2 gap-2">
+            <div className={`${text ? 'mb-2 ' : ''}flex flex-col items-end gap-2`}>
               {imageParts.map((part, index) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={`${message.id}-image-${index}`}
                   src={part.url}
                   alt={part.filename || `Imagen ${index + 1}`}
-                  className="max-h-48 rounded-xl object-cover"
+                  className="max-h-48 max-w-full rounded-xl object-contain"
                 />
               ))}
             </div>
           )}
-          {text}
+          {text && <p className="text-right">{text}</p>}
         </div>
       </div>
     );
