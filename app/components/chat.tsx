@@ -44,6 +44,12 @@ function stripDisplayMath(text: string): string {
 function preprocessLatex(text: string): string {
   text = text.replace(/\\\[([\s\S]*?)\\\]/g, (_, m) => `$$\n${normalizeDisplayMath(m.trim())}\n$$`);
   text = text.replace(/\\\(([\s\S]*?)\\\)/g, (_, m) => `$${m.trim()}$`);
+  // Model sometimes uses plain [ ] instead of \[ \] for multiline environments.
+  // Complete block: [ \begin{...}...\end{...} ]
+  text = text.replace(/\[\s*(\\begin\{[\s\S]*?\\end\{[^}]+\})\s*\]/g, (_, m) => `$$\n${normalizeDisplayMath(m.trim())}\n$$`);
+  // Incomplete block at end of string (still streaming): convert [ \begin{...
+  // to an opening $$ so stripDisplayMath can detect and strip the unclosed block.
+  text = text.replace(/\[\s*(\\begin\{[\s\S]*)$/, (_, m) => `$$\n${m}`);
   text = text.replace(/\[ ([^\n[\]]+) \]/g, (match, m) => {
     if (/\\[a-zA-Z]|[_^]/.test(m)) return `$$\n${normalizeDisplayMath(m.trim())}\n$$`;
     return match;
