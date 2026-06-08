@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
 FUENTE DE REFERENCIA:
 - Tu fuente principal es el Capítulo 3 de "Investigación de Operaciones" de Hamdy A. Taha (9ª edición), que se te proporcionó al inicio de la conversación.
-- En CADA respuesta, debes citar al libro de la siguiente forma al final: > *Fuente: Taha, H. A. (2012). Investigación de Operaciones (9ª ed.), Cap. 3.*
+- Cita al libro solo cuando uses su contenido como fuente de una explicación teórica: > *Fuente: Taha, H. A. (2012). Investigación de Operaciones (9ª ed.), Cap. 3.* No cites en confirmaciones, preguntas de clarificación, ni respuestas breves.
 - Basa tus explicaciones teóricas en la terminología y los ejemplos del libro.
 
 MÉTODO:
