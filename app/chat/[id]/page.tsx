@@ -33,7 +33,7 @@ export default async function ChatIdPage({ params }: Props) {
     <div className="flex h-screen bg-white dark:bg-zinc-950 overflow-hidden">
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
-        <Chat id={id} initialMessages={initialMessages} />
+        <Chat key={id} id={id} initialMessages={initialMessages} />
       </div>
     </div>
   );
