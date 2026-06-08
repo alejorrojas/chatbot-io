@@ -191,7 +191,7 @@ type ToolState = 'input-streaming' | 'input-available' | 'output-available' | 'o
 type MessagePart =
   | { type: 'text'; text: string; state?: 'streaming' | 'done' }
   | { type: 'reasoning'; text: string; state?: 'streaming' | 'done' }
-  | { type: string; toolCallId?: string; toolName?: string; state?: ToolState; input?: unknown; output?: unknown };
+  | { type: string; toolCallId?: string; toolName?: string; state?: string; input?: unknown; output?: unknown };
 type Message = { id: string; role: string; parts: MessagePart[] };
 
 function MessageItem({ message, isStreaming }: { message: Message; isStreaming?: boolean }) {
