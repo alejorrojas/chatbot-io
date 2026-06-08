@@ -15,13 +15,29 @@ function isTableExpression(math: string): boolean {
 }
 
 function stripDisplayMath(text: string): string {
-  // Only replace complete $$...$$ blocks that are table/matrix expressions with a placeholder
+  // Replace complete $$...$$ blocks that are table/matrix expressions with a placeholder;
+  // non-table expressions are kept so they render inline during streaming.
   let result = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, inner) => {
     if (isTableExpression(inner)) return '\n*— tabla Simplex —*\n';
     return match;
   });
-  // Strip any unclosed $$ at the end (incomplete block still streaming)
-  result = result.replace(/\$\$[\s\S]*$/, '');
+  // Count remaining $$ tokens. Non-table blocks contribute 2 each (open + close).
+  // An odd count means there is one unclosed $$ at the end — strip from there to avoid
+  // rendering a partial block. We must not use a simple regex here because non-table
+  // blocks are kept with their $$ delimiters and a greedy regex would eat them too.
+  let count = 0;
+  let lastPos = -1;
+  let searchPos = 0;
+  while (true) {
+    const idx = result.indexOf('$$', searchPos);
+    if (idx === -1) break;
+    count++;
+    lastPos = idx;
+    searchPos = idx + 2;
+  }
+  if (count % 2 !== 0) {
+    result = result.slice(0, lastPos);
+  }
   return result;
 }
 
