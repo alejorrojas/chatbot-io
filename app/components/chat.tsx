@@ -21,35 +21,44 @@ type PendingImage = {
   previewUrl: string;
 };
 
-function isTableExpression(math: string): boolean {
-  return /\\begin\{(array|tabular|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}/.test(math);
+function isTableExpression(content: string): boolean {
+  return /\\begin\{(array|tabular|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}/.test(content);
+}
+
+function buildPartialTable(content: string): string {
+  const m = content.match(/((?:\\displaystyle\s+)?)(\\begin\{array\}\{[^}]+\})([\s\S]*)/);
+  if (!m) return '';
+  const [, prefix, arrayOpen, rest] = m;
+  // Split on \\ (LaTeX row separator); last segment is the incomplete row still streaming
+  const parts = rest.split(/\\\\/);
+  const completeRows = parts.slice(0, -1);
+  if (completeRows.length === 0) return '';
+  return `$$\n${prefix}${arrayOpen}\n${completeRows.join('\\\\')}\\\\\n\\end{array}\n$$`;
 }
 
 function stripDisplayMath(text: string): string {
-  // Replace complete $$...$$ blocks that are table/matrix expressions with a placeholder;
-  // non-table expressions are kept so they render inline during streaming.
-  let result = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, inner) => {
-    if (isTableExpression(inner)) return '\n*— tabla Simplex —*\n';
-    return match;
-  });
-  // Count remaining $$ tokens. Non-table blocks contribute 2 each (open + close).
-  // An odd count means there is one unclosed $$ at the end — strip from there to avoid
-  // rendering a partial block. We must not use a simple regex here because non-table
-  // blocks are kept with their $$ delimiters and a greedy regex would eat them too.
+  // Count $$ tokens — an odd count means the last one is unclosed (still streaming).
+  // All complete blocks (even count) render as-is; only the unclosed tail needs handling.
   let count = 0;
   let lastPos = -1;
-  let searchPos = 0;
+  let pos = 0;
   while (true) {
-    const idx = result.indexOf('$$', searchPos);
+    const idx = text.indexOf('$$', pos);
     if (idx === -1) break;
     count++;
     lastPos = idx;
-    searchPos = idx + 2;
+    pos = idx + 2;
   }
-  if (count % 2 !== 0) {
-    result = result.slice(0, lastPos);
+  if (count % 2 === 0) return text;
+
+  const before = text.slice(0, lastPos);
+  const unclosedContent = text.slice(lastPos + 2);
+
+  if (isTableExpression(unclosedContent)) {
+    const partial = buildPartialTable(unclosedContent);
+    return before + (partial ? '\n' + partial : '');
   }
-  return result;
+  return before;
 }
 
 function preprocessLatex(text: string): string {
@@ -84,6 +93,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
   const { messages, sendMessage, status } = useChat({
     id,
     messages: initialMessages,
+    experimental_throttle: 50,
     transport: new DefaultChatTransport({ api: '/api/chat' }),
     onFinish: () => {
       router.refresh();
