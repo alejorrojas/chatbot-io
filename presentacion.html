@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simplex AI · Presentación del proyecto</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg-2: #11182e;
+    --panel: rgba(255, 255, 255, 0.04);
+    --panel-border: rgba(255, 255, 255, 0.10);
+    --ink: #eef2ff;
+    --muted: #9aa6c4;
+    --accent: #5b8cff;
+    --accent-2: #38e0c4;
+    --accent-3: #ffb454;
+    --danger: #ff6b81;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--sans);
+    background: radial-gradient(1200px 800px at 80% -10%, #1b2950 0%, transparent 60%),
+                radial-gradient(1000px 700px at 0% 110%, #122a3a 0%, transparent 55%),
+                var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  /* ---------- Deck ---------- */
+  .deck { position: fixed; inset: 0; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4.5vh 7vw 9vh;
+    opacity: 0;
+    transition: opacity .4s ease;
+  }
+  .slide.active { display: flex; opacity: 1; animation: rise .5s ease; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Typography ---------- */
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .28em;
+    font-size: clamp(.62rem, 1vw, .8rem);
+    color: var(--accent-2);
+    font-weight: 700;
+    margin-bottom: 1.1rem;
+  }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 1.02; letter-spacing: -.02em; }
+  h2 { font-size: clamp(1.7rem, 3.8vw, 2.9rem); line-height: 1.08; letter-spacing: -.01em; margin-bottom: 1.8rem; }
+  h3 { font-size: clamp(1rem, 1.6vw, 1.3rem); }
+  p  { color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.6; max-width: 60ch; }
+  .lead { font-size: clamp(1.1rem, 1.9vw, 1.5rem); color: #cdd7f3; }
+  strong { color: var(--ink); }
+  .accent { color: var(--accent); }
+  .accent-2 { color: var(--accent-2); }
+  .accent-3 { color: var(--accent-3); }
+
+  /* ---------- Cover ---------- */
+  .cover { align-items: center; text-align: center; justify-content: center; }
+  .cover .logo { width: 84px; opacity: .95; margin-bottom: 1.6rem; filter: drop-shadow(0 4px 20px rgba(0,0,0,.4)); }
+  .cover h1 {
+    background: linear-gradient(120deg, #fff 20%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cover .sub { margin: 1.4rem auto 0; max-width: 56ch; }
+  .badges { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: center; margin-top: 2.2rem; }
+  .badge {
+    border: 1px solid var(--panel-border); background: var(--panel);
+    border-radius: 999px; padding: .5rem 1rem; font-size: .82rem; color: var(--muted);
+  }
+  .badge b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Grid / cards ---------- */
+  .grid { display: grid; gap: 1rem; margin-top: .4rem; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 16px; padding: 1.2rem 1.3rem;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-3px); border-color: rgba(91,140,255,.45); }
+  .card .ico { font-size: 1.5rem; margin-bottom: .6rem; }
+  .card h3 { margin-bottom: .35rem; }
+  .card p { font-size: .95rem; line-height: 1.5; }
+
+  .pill {
+    display: inline-block; font: 600 .78rem var(--mono);
+    padding: .28rem .6rem; border-radius: 8px;
+    background: rgba(91,140,255,.14); color: #bcd0ff; border: 1px solid rgba(91,140,255,.3);
+  }
+
+  /* ---------- Stack table ---------- */
+  .stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem 2.2rem; margin-top: .5rem; }
+  .stack-row {
+    display: flex; align-items: baseline; gap: .9rem;
+    padding: .7rem .2rem; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .stack-row .layer { color: var(--accent-2); font-weight: 700; min-width: 130px; font-size: .92rem; }
+  .stack-row .tech { color: var(--ink); font-weight: 600; }
+  .stack-row .tech span { color: var(--muted); font-weight: 400; font-size: .86rem; }
+
+  /* ---------- Diagram ---------- */
+  pre.diagram {
+    font-family: var(--mono); font-size: clamp(.6rem, 1.05vw, .92rem);
+    line-height: 1.45; color: #b9c6ec;
+    background: rgba(0,0,0,.28); border: 1px solid var(--panel-border);
+    border-radius: 14px; padding: 1.4rem 1.6rem; overflow: auto; white-space: pre;
+  }
+
+  /* ---------- Flow ---------- */
+  .flow { display: flex; flex-direction: column; gap: .55rem; margin-top: .3rem; }
+  .step { display: flex; gap: 1rem; align-items: flex-start; }
+  .step .n {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; font: 700 .85rem var(--mono);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07101f;
+  }
+  .step .txt { font-size: clamp(.9rem, 1.35vw, 1.08rem); color: #cdd7f3; line-height: 1.4; padding-top: .25rem; }
+  .step .txt b { color: #fff; }
+  .step code { font-family: var(--mono); font-size: .85em; background: rgba(255,255,255,.07); padding: .1rem .4rem; border-radius: 5px; color: #bcd0ff; }
+
+  /* ---------- Two column ---------- */
+  .cols { display: grid; grid-template-columns: 1.05fr .95fr; gap: 2.4rem; align-items: center; }
+
+  ul.clean { list-style: none; display: flex; flex-direction: column; gap: .85rem; }
+  ul.clean li { display: flex; gap: .8rem; color: #cdd7f3; font-size: clamp(.95rem, 1.4vw, 1.15rem); line-height: 1.45; }
+  ul.clean li::before { content: "▸"; color: var(--accent); flex: none; }
+  ul.clean li b { color: #fff; }
+
+  .codecard {
+    background: #070c1a; border: 1px solid var(--panel-border); border-radius: 14px;
+    padding: 1.2rem 1.4rem; font-family: var(--mono); font-size: clamp(.72rem, 1.1vw, .95rem);
+    line-height: 1.55; color: #cdd7f3; overflow: auto;
+  }
+  .codecard .c-key { color: var(--accent-3); }
+  .codecard .c-str { color: var(--accent-2); }
+  .codecard .c-com { color: #5d6b8f; font-style: italic; }
+  .codecard .c-fn { color: var(--accent); }
+
+  /* ---------- Highlight box ---------- */
+  .highlight {
+    border-left: 4px solid var(--accent-2);
+    background: linear-gradient(90deg, rgba(56,224,196,.10), transparent);
+    padding: 1rem 1.3rem; border-radius: 0 12px 12px 0; margin-top: 1.2rem;
+  }
+  .highlight p { color: #d8e2ff; max-width: none; }
+
+  /* ---------- Const table ---------- */
+  table.consts { width: 100%; border-collapse: collapse; margin-top: .4rem; font-size: clamp(.8rem,1.2vw,1rem); }
+  table.consts td, table.consts th { padding: .55rem .8rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); }
+  table.consts th { color: var(--accent-2); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; }
+  table.consts code { font-family: var(--mono); color: var(--accent-3); }
+  table.consts td:last-child { color: var(--muted); }
+
+  /* ---------- Members ---------- */
+  .members { display: grid; grid-template-columns: repeat(3,1fr); gap: .8rem; margin-top: 1.4rem; max-width: 880px; }
+  .member { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px; padding: .9rem 1rem; text-align: left; }
+  .member .nm { font-weight: 600; color: #fff; font-size: .95rem; }
+  .member .rl { color: var(--accent-2); font-size: .78rem; margin-top: .2rem; }
+
+  /* ---------- Chrome ---------- */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 50;
+    background: rgba(255,255,255,.06);
+  }
+  .progress { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .35s; }
+
+  .footer {
+    position: fixed; bottom: 2.3vh; left: 7vw; right: 7vw; z-index: 40;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted); font-size: .78rem; pointer-events: none;
+  }
+  .footer .nav { pointer-events: auto; display: flex; gap: .5rem; align-items: center; }
+  .footer button {
+    background: var(--panel); border: 1px solid var(--panel-border); color: var(--ink);
+    width: 34px; height: 34px; border-radius: 9px; cursor: pointer; font-size: 1rem;
+    transition: background .2s, border-color .2s;
+  }
+  .footer button:hover { background: rgba(91,140,255,.2); border-color: var(--accent); }
+  .footer .count { font-family: var(--mono); }
+  .kicker { letter-spacing: .15em; text-transform: uppercase; }
+
+  .dots { position: fixed; right: 1.4vw; top: 50%; transform: translateY(-50%); z-index: 45; display: flex; flex-direction: column; gap: .55rem; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.18); cursor: pointer; transition: all .2s; border: none; padding: 0; }
+  .dot.active { background: var(--accent-2); transform: scale(1.4); }
+
+  @media (max-width: 720px) {
+    .g3,.g4,.stack-grid,.members,.cols { grid-template-columns: 1fr; }
+    .g2 { grid-template-columns: 1fr; }
+    .dots { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="progress" id="progress"></div></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 · Cover -->
+  <section class="slide cover active">
+    <img class="logo" src="public/utn-logo.png" alt="UTN" />
+    <div class="eyebrow">UTN · Facultad Regional Resistencia · Investigación Operativa</div>
+    <h1>Simplex&nbsp;AI</h1>
+    <p class="lead sub">Un tutor conversacional que resuelve y <strong>explica</strong> problemas de programación lineal con el método Simplex, iteración por iteración.</p>
+    <div class="badges">
+      <span class="badge">Grupo&nbsp;<b>Los Opti-místicos</b></span>
+      <span class="badge">Ciclo Lectivo&nbsp;<b>2026</b></span>
+      <span class="badge">Docentes&nbsp;<b>Screpnik · Vera</b></span>
+    </div>
+  </section>
+
+  <!-- 2 · El problema / objetivo -->
+  <section class="slide">
+    <div class="eyebrow">El problema que resolvemos</div>
+    <h2>Aprender Simplex es difícil:<br>las respuestas solas no enseñan</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>Las calculadoras de LP dan el <b>resultado</b>, pero ocultan el <b>proceso</b>.</li>
+        <li>Un LLM solo, "a ojo", <b>inventa números</b> y se equivoca en la aritmética.</li>
+        <li>El estudiante necesita ver <b>cada iteración</b>: variable entrante, saliente, pivote.</li>
+      </ul>
+      <div class="highlight">
+        <p><strong>Nuestra apuesta:</strong> separar el <span class="accent-2">cálculo exacto</span> (un solver determinista) de la <span class="accent">explicación pedagógica</span> (el LLM). Lo mejor de los dos mundos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Funcionalidades -->
+  <section class="slide">
+    <div class="eyebrow">Qué hace la aplicación</div>
+    <h2>Funcionalidades clave</h2>
+    <div class="grid g3">
+      <div class="card"><div class="ico">🧮</div><h3>Solver determinista</h3><p>Resuelve con una implementación Big-M propia en TypeScript. Los números son <b>exactos</b>, no generados por IA.</p></div>
+      <div class="card"><div class="ico">🎓</div><h3>Explicación paso a paso</h3><p>Por cada iteración: tabla, variable entrante/saliente, pivote y operaciones de fila — como un profesor.</p></div>
+      <div class="card"><div class="ico">📐</div><h3>Render LaTeX</h3><p>Las tablas Simplex se muestran en formato matemático real con KaTeX.</p></div>
+      <div class="card"><div class="ico">📚</div><h3>Teoría con fuente</h3><p>Razona sobre el Cap. 3 de Taha (9ª ed.), cargado como contexto, y lo cita.</p></div>
+      <div class="card"><div class="ico">💬</div><h3>Chats persistidos</h3><p>Historial por usuario en el sidebar, con títulos generados por IA, rename y borrado.</p></div>
+      <div class="card"><div class="ico">🔐</div><h3>Cuentas seguras</h3><p>Login/signup por email, sesiones protegidas y datos aislados por usuario (RLS).</p></div>
+    </div>
+  </section>
+
+  <!-- 4 · Stack -->
+  <section class="slide">
+    <div class="eyebrow">Tecnologías utilizadas</div>
+    <h2>Stack técnico</h2>
+    <div class="stack-grid">
+      <div class="stack-row"><span class="layer">Framework</span><span class="tech">Next.js 16 <span>· App Router · SSR · API Routes</span></span></div>
+      <div class="stack-row"><span class="layer">UI</span><span class="tech">React 19 <span>· Tailwind CSS v4</span></span></div>
+      <div class="stack-row"><span class="layer">IA</span><span class="tech">Vercel AI SDK v6 <span>· streaming · tool use</span></span></div>
+      <div class="stack-row"><span class="layer">Modelos</span><span class="tech">OpenAI gpt-5.5 <span>· gpt-4.1-mini (títulos)</span></span></div>
+      <div class="stack-row"><span class="layer">Auth & DB</span><span class="tech">Supabase <span>· Postgres · Auth · Storage · RLS</span></span></div>
+      <div class="stack-row"><span class="layer">Matemática</span><span class="tech">KaTeX <span>· react-markdown · remark-math</span></span></div>
+      <div class="stack-row"><span class="layer">Validación</span><span class="tech">Zod <span>· schema de la tool</span></span></div>
+      <div class="stack-row"><span class="layer">Lenguaje / PM</span><span class="tech">TypeScript 5 <span>· Bun</span></span></div>
+    </div>
+  </section>
+
+  <!-- 5 · Arquitectura -->
+  <section class="slide">
+    <div class="eyebrow">Arquitectura</div>
+    <h2>Cliente · Servidor · Servicios</h2>
+    <pre class="diagram">┌──────────────────────────── CLIENTE (Browser) ────────────────────────────┐
+│  React 19 + Next.js App Router                                             │
+│   sidebar.tsx  (historial)          chat.tsx  (useChat · streaming)        │
+│   GET /api/chats                    react-markdown + KaTeX                 │
+└───────────────────────────────┬───────────────────────────────────────────┘
+                                │  POST /api/chat   (HTTP streaming)
+┌───────────────────────────────▼───────────────────────────────────────────┐
+│  SERVIDOR · app/api/chat/route.ts                                          │
+│   1. Autentica (Supabase)   2. Carga PDF Taha como contexto                │
+│   3. streamText(gpt-5.5, tools:{ solveSimplex })   4. onFinish → persiste  │
+└───────────┬───────────────────────┬───────────────────────────┬───────────┘
+            │                       │                           │
+   ┌────────▼────────┐    ┌─────────▼─────────┐       ┌─────────▼─────────┐
+   │   OpenAI API    │    │   simplex.ts      │       │     Supabase      │
+   │  gpt-5.5 tutor  │    │  Big-M Simplex    │       │  Postgres · Auth  │
+   │  gpt-4.1-mini   │    │  → tableaux[]     │       │  Storage · RLS    │
+   └─────────────────┘    └───────────────────┘       └───────────────────┘</pre>
+  </section>
+
+  <!-- 6 · Flujo -->
+  <section class="slide">
+    <div class="eyebrow">Cómo funciona</div>
+    <h2>El flujo de una consulta</h2>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><div class="txt">El usuario plantea el problema → <code>useChat</code> hace <b>POST /api/chat</b>.</div></div>
+      <div class="step"><div class="n">2</div><div class="txt">El servidor <b>valida la sesión</b> y hace upsert del chat.</div></div>
+      <div class="step"><div class="n">3</div><div class="txt"><code>gpt-5.5</code> confirma que entendió y pregunta: <b>"¿Lo resuelvo con Simplex?"</b> — todavía no calcula.</div></div>
+      <div class="step"><div class="n">4</div><div class="txt">El usuario confirma → el modelo decide <b>invocar la tool</b> <code>solveSimplex</code> con el problema en JSON.</div></div>
+      <div class="step"><div class="n">5</div><div class="txt"><code>simplex.ts</code> ejecuta Big-M y devuelve <b>los tableaux de cada iteración</b>.</div></div>
+      <div class="step"><div class="n">6</div><div class="txt">El modelo explica iteración por iteración; los tokens llegan por <b>streaming</b> y KaTeX renderiza el LaTeX al vuelo.</div></div>
+      <div class="step"><div class="n">7</div><div class="txt"><code>onFinish</code> <b>persiste todo</b> en Supabase y genera el título con <code>gpt-4.1-mini</code>.</div></div>
+    </div>
+  </section>
+
+  <!-- 7 · Decisión de diseño clave -->
+  <section class="slide">
+    <div class="eyebrow">Decisión de diseño · la más importante</div>
+    <h2>El LLM <span class="accent-3">nunca</span> calcula los números</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>El modelo <b>siempre invoca al solver</b> y usa sus resultados; no hace aritmética por su cuenta.</li>
+        <li>Esto elimina las <b>alucinaciones numéricas</b>, el punto débil de los LLM en matemática.</li>
+        <li>El solver entrega un <b>snapshot del tableau por iteración</b>: insumo perfecto para que el modelo "lea la pizarra" y explique.</li>
+        <li>Resultado: <b>exactitud determinista</b> + <b>explicación natural</b>.</li>
+      </ul>
+      <div class="codecard">
+<span class="c-com">// Contrato entre LLM y solver (Zod)</span>
+{
+  <span class="c-key">opType</span>: <span class="c-str">"max"</span> | <span class="c-str">"min"</span>,
+  <span class="c-key">objective</span>: { <span class="c-key">x1</span>: 3, <span class="c-key">x2</span>: 5 },
+  <span class="c-key">constraints</span>: [
+    { <span class="c-key">coefficients</span>: { x1: 1, x2: 2 },
+      <span class="c-key">type</span>: <span class="c-str">"&lt;="</span>, <span class="c-key">rhs</span>: 4 }
+  ]
+}
+<span class="c-com">// → { feasible, bounded, optimal,</span>
+<span class="c-com">//     variables, tableaux[] }</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · Solver Big-M -->
+  <section class="slide">
+    <div class="eyebrow">El núcleo matemático</div>
+    <h2>Solver Simplex Big-M, escrito a mano</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li><b>Forma estándar automática:</b> ≤ agrega holgura · ≥ agrega exceso + artificial · = agrega artificial.</li>
+        <li><b>Penalización Big-M</b> = 1.000.000 fuerza la salida de las variables artificiales.</li>
+        <li><b>Iteración:</b> entrante por costo reducido más negativo · saliente por razón mínima · pivoteo por operaciones de fila.</li>
+        <li>Detecta <b>infactibilidad</b> y <b>no acotamiento</b>. Sin dependencias externas para la matemática.</li>
+      </ul>
+      <table class="consts">
+        <tr><th>Constante</th><th>Valor</th><th>Uso</th></tr>
+        <tr><td><code>BIG_M</code></td><td>1e6</td><td>Penaliza artificiales</td></tr>
+        <tr><td><code>OPTIMALITY_TOL</code></td><td>1e-9</td><td>Costo reducido neg.</td></tr>
+        <tr><td><code>PIVOT_TOL</code></td><td>1e-9</td><td>Razón mínima</td></tr>
+        <tr><td><code>FEASIBILITY_TOL</code></td><td>1e-6</td><td>Artificial básica</td></tr>
+        <tr><td><code>MAX_ITERATIONS</code></td><td>200</td><td>Anti bucle infinito</td></tr>
+        <tr><td><code>ROUND_DECIMALS</code></td><td>4</td><td>Decimales finales</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 9 · Persistencia + DB -->
+  <section class="slide">
+    <div class="eyebrow">Persistencia de datos</div>
+    <h2>Base de datos y guardado</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>El guardado ocurre en <code>onFinish</code> tras cerrar el stream — <b><code>consumeStream()</code></b> asegura que corra aunque el cliente se desconecte.</li>
+        <li>Estrategia <b>delete + re-insert</b> de todos los mensajes: estado consistente ante reintentos.</li>
+        <li>Mensajes guardados como <b>JSONB</b> (texto, imágenes, tool calls y resultados).</li>
+        <li>Índices por <code>(user_id, updated_at)</code> y <code>(chat_id, order)</code> para cargas rápidas.</li>
+      </ul>
+      <div class="codecard">
+<span class="c-com">-- Esquema</span>
+<span class="c-fn">chats</span> ( id <span class="c-key">uuid</span> PK, user_id <span class="c-key">uuid</span> FK,
+        title, created_at, updated_at )
+
+<span class="c-fn">messages</span> ( id <span class="c-key">text</span> PK,
+           chat_id <span class="c-key">uuid</span> FK,
+           role, parts <span class="c-key">jsonb</span>,
+           "order" <span class="c-key">int</span> )
+
+<span class="c-com">-- updated_at vía trigger en cada UPDATE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · Seguridad -->
+  <section class="slide">
+    <div class="eyebrow">Seguridad</div>
+    <h2>Tres capas de protección</h2>
+    <div class="grid g3">
+      <div class="card"><div class="ico">🛡️</div><h3>Row Level Security</h3><p>RLS en toda la base: políticas SELECT/INSERT/UPDATE/DELETE garantizan que cada usuario solo ve y modifica <b>sus propios datos</b> (<code>auth.uid() = user_id</code>).</p></div>
+      <div class="card"><div class="ico">🚧</div><h3>Middleware de rutas</h3><p><code>proxy.ts</code> verifica la sesión en cada request a <code>/chat/*</code>. Sin sesión válida → <b>redirect a /login</b> antes de procesar la ruta.</p></div>
+      <div class="card"><div class="ico">🔑</div><h3>API protegida</h3><p><code>/api/chat</code> valida con <code>getUser()</code> antes de procesar; sin usuario responde <b>401</b>. Las claves secretas viven solo en el servidor.</p></div>
+    </div>
+  </section>
+
+  <!-- 11 · Decisiones de diseño resumen -->
+  <section class="slide">
+    <div class="eyebrow">Resumen</div>
+    <h2>Decisiones de diseño que tomamos</h2>
+    <div class="grid g2">
+      <div class="card"><h3 class="accent-2">Solver ≠ LLM</h3><p>Separar cálculo exacto de explicación: cero alucinaciones numéricas.</p></div>
+      <div class="card"><h3 class="accent-2">Big-M, no dos fases</h3><p>Maneja todos los tipos de restricción en un solo paso, más simple de explicar.</p></div>
+      <div class="card"><h3 class="accent-2">Confirmación previa</h3><p>El modelo confirma el modelo matemático antes de resolver: refuerza el aprendizaje.</p></div>
+      <div class="card"><h3 class="accent-2"><code>stepCountIs(5)</code></h3><p>Límite del ciclo LLM→tool→LLM para evitar bucles en problemas complejos.</p></div>
+      <div class="card"><h3 class="accent-2">PDF como fuente</h3><p>El Cap. 3 de Taha se inyecta como contexto para anclar la teoría y citarla.</p></div>
+      <div class="card"><h3 class="accent-2">Server + Client Components</h3><p>El historial se hidrata en el servidor; el chat es interactivo en el cliente.</p></div>
+    </div>
+  </section>
+
+  <!-- 12 · Limitaciones -->
+  <section class="slide">
+    <div class="eyebrow">Honestidad técnica</div>
+    <h2>Limitaciones conocidas</h2>
+    <div class="cols">
+      <ul class="clean">
+        <li>Asume variables de decisión <b>no negativas</b> (x ≥ 0).</li>
+        <li>No soporta <b>variables libres</b> (sin restricción de signo).</li>
+        <li>El <b>RHS</b> de cada restricción debe ser ≥ 0.</li>
+        <li>Sin <b>regla de Bland</b>: problemas degenerados podrían ciclar (corte a 200 iteraciones).</li>
+        <li>Alcance acotado a propósito: <b>solo método Simplex</b>.</li>
+      </ul>
+      <div class="highlight">
+        <p>Son límites <strong>conscientes y documentados</strong>: el objetivo es enseñar Simplex en problemas educativos, no ser un solver industrial de propósito general.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · Cierre -->
+  <section class="slide cover">
+    <img class="logo" src="public/utn-logo.png" alt="UTN" />
+    <div class="eyebrow">Gracias</div>
+    <h1 style="font-size:clamp(2rem,5vw,3.6rem)">¿Probamos una demo?</h1>
+    <p class="lead sub">chatbot-io-omega.vercel.app</p>
+    <div class="members">
+      <div class="member"><div class="nm">Rojas, Alejo Ivan</div><div class="rl">Scrum Master</div></div>
+      <div class="member"><div class="nm">Rodríguez Leiva, Juan Ignacio</div><div class="rl">Product Owner</div></div>
+      <div class="member"><div class="nm">Aguirre Arteaga, Jaider Camilo</div><div class="rl">Desarrollo</div></div>
+      <div class="member"><div class="nm">Dominguez, Bruno Ivan</div><div class="rl">Desarrollo</div></div>
+      <div class="member"><div class="nm">Casano, Julieta</div><div class="rl">Producción</div></div>
+      <div class="member"><div class="nm">Sotelo, María Celina</div><div class="rl">Testeo</div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+
+<div class="footer">
+  <span class="kicker">Simplex AI · Los Opti-místicos</span>
+  <div class="nav">
+    <button id="prev" aria-label="Anterior">‹</button>
+    <span class="count"><span id="cur">1</span> / <span id="total">13</span></span>
+    <button id="next" aria-label="Siguiente">›</button>
+  </div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsWrap = document.getElementById('dots');
+  const progress = document.getElementById('progress');
+  const curEl = document.getElementById('cur');
+  document.getElementById('total').textContent = slides.length;
+  let i = 0;
+
+  slides.forEach((_, idx) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (idx === 0 ? ' active' : '');
+    d.addEventListener('click', () => go(idx));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+    progress.style.width = ((i + 1) / slides.length * 100) + '%';
+    curEl.textContent = i + 1;
+  }
+
+  document.getElementById('next').addEventListener('click', () => go(i + 1));
+  document.getElementById('prev').addEventListener('click', () => go(i - 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(i + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  // Swipe en táctil
+  let x0 = null;
+  document.addEventListener('touchstart', e => x0 = e.touches[0].clientX, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1));
+    x0 = null;
+  });
+
+  progress.style.width = (1 / slides.length * 100) + '%';
+</script>
+</body>
+</html>
