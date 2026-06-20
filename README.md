@@ -21,12 +21,12 @@
 
   | Integrante | Legajo | Rol |
   |---|---|---|
-  | Aguirre Arteaga, Jaider Camilo | | Equipo de desarrollo |
-  | Casano, Julieta || Equipo de producción |
-  | Dominguez, Bruno Ivan | 26.629 | Equipo de desarrollo |
-  | Rojas, Alejo Ivan | 27.316 | Scrum Master |
-  | Rodríguez Leiva, Juan Ignacio | 28.733 | Product Owner |
-  | Sotelo, María Celina | | Equipo de testeo |
+  | Aguirre Arteaga, Jaider Camilo | 27328 | Equipo de desarrollo |
+  | Casano, Julieta | 28740 | Equipo de producción |
+  | Dominguez, Bruno Ivan | 26629 | Equipo de desarrollo |
+  | Rojas, Alejo Ivan | 27316 | Scrum Master |
+  | Rodríguez Leiva, Juan Ignacio | 28733 | Product Owner |
+  | Sotelo, María Celina | 27961 | Equipo de testeo |
 
   <br />
 
