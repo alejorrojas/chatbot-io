@@ -22,7 +22,7 @@
   | Integrante | Legajo | Rol |
   |---|---|---|
   | Aguirre Arteaga, Jaider Camilo | 27328 | Equipo de desarrollo |
-  | Casano, Julieta | 28740 | Equipo de producción |
+  | Casano, Julieta | 28740 | Equipo de desarrollo |
   | Dominguez, Bruno Ivan | 26629 | Equipo de desarrollo |
   | Rojas, Alejo Ivan | 27316 | Scrum Master |
   | Rodríguez Leiva, Juan Ignacio | 28733 | Product Owner |
