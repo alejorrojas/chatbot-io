@@ -21,12 +21,12 @@
 
   | Integrante | Legajo | Rol |
   |---|---|---|
-  | Aguirre Arteaga, Jaider Camilo | | Equipo de desarrollo |
-  | Casano, Julieta || Equipo de producción |
-  | Dominguez, Bruno Ivan | 26.629 | Equipo de desarrollo |
-  | Rojas, Alejo Ivan | 27.316 | Scrum Master |
-  | Rodríguez Leiva, Juan Ignacio | 28.733 | Product Owner |
-  | Sotelo, María Celina || Equipo de testeo |
+  | Aguirre Arteaga, Jaider Camilo | 27328 | Equipo de desarrollo |
+  | Casano, Julieta | 28740 | Equipo de desarrollo |
+  | Dominguez, Bruno Ivan | 26629 | Equipo de desarrollo |
+  | Rojas, Alejo Ivan | 27316 | Scrum Master |
+  | Rodríguez Leiva, Juan Ignacio | 28733 | Product Owner |
+  | Sotelo, María Celina | 27961 | Equipo de testeo |
 
   <br />
 
@@ -55,6 +55,19 @@
 - **Solver determinista** — el problema se resuelve con una implementación Big-M de Simplex escrita en TypeScript, no por el LLM. Los números son exactos.
 - **Explicación pedagógica** — el modelo usa los tableaux del solver para explicar cada iteración: variable entrante, variable saliente, pivote y operaciones elementales.
 - **Render LaTeX** — las tablas Simplex se muestran en formato matemático usando KaTeX.
+
+## Plan de Sprints
+
+- **Sprint 1:** Formación de equipos y backlog inicial.
+- **Sprint 2:** Investigación teórica.
+- **Sprint 3:** Diseño del chatbot y el modelo.
+- **Sprint 4:** Modelado matemático.
+- **Sprint 5:** Implementación de la herramienta.
+- **Sprint 6:** Integración parcial.
+- **Sprint 7:** Integración completa.
+- **Sprint 8:** Testing.
+- **Sprint 9:** Optimización.
+- **Sprint 10:** Entrega final.
 
 ## Cómo correr localmente
 
