@@ -56,6 +56,19 @@
 - **Explicación pedagógica** — el modelo usa los tableaux del solver para explicar cada iteración: variable entrante, variable saliente, pivote y operaciones elementales.
 - **Render LaTeX** — las tablas Simplex se muestran en formato matemático usando KaTeX.
 
+## Plan de Sprints
+
+- **Sprint 1:** Formación de equipos y backlog inicial.
+- **Sprint 2:** Investigación teórica.
+- **Sprint 3:** Diseño del chatbot y el modelo.
+- **Sprint 4:** Modelado matemático.
+- **Sprint 5:** Implementación de la herramienta.
+- **Sprint 6:** Integración parcial.
+- **Sprint 7:** Integración completa.
+- **Sprint 8:** Testing.
+- **Sprint 9:** Optimización.
+- **Sprint 10:** Entrega final.
+
 ## Cómo correr localmente
 
 ```bash
