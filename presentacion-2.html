@@ -534,21 +534,6 @@
     </div>
   </section>
 
-  <!-- 6 · Flujo -->
-  <section class="slide">
-    <div class="eyebrow">Cómo funciona</div>
-    <h2>El flujo de una consulta</h2>
-    <div class="flow">
-      <div class="step"><div class="n">1</div><div class="txt">El usuario plantea el problema → <code>useChat</code> hace <b>POST /api/chat</b>.</div></div>
-      <div class="step"><div class="n">2</div><div class="txt">El servidor <b>valida la sesión</b> y hace upsert del chat.</div></div>
-      <div class="step"><div class="n">3</div><div class="txt"><code>gpt-5.5</code> confirma que entendió y pregunta: <b>"¿Lo resuelvo con Simplex?"</b> — todavía no calcula.</div></div>
-      <div class="step"><div class="n">4</div><div class="txt">El usuario confirma → el modelo decide <b>invocar la tool</b> <code>solveSimplex</code> con el problema en JSON.</div></div>
-      <div class="step"><div class="n">5</div><div class="txt"><code>simplex.ts</code> ejecuta Big-M y devuelve <b>los tableaux de cada iteración</b>.</div></div>
-      <div class="step"><div class="n">6</div><div class="txt">El modelo explica iteración por iteración; los tokens llegan por <b>streaming</b> y KaTeX renderiza el LaTeX al vuelo.</div></div>
-      <div class="step"><div class="n">7</div><div class="txt"><code>onFinish</code> <b>persiste todo</b> en Supabase y genera el título con <code>gpt-4.1-mini</code>.</div></div>
-    </div>
-  </section>
-
   <!-- 7 · Decisión de diseño clave -->
   <section class="slide">
     <div class="eyebrow">Decisión de diseño · la más importante</div>
@@ -573,66 +558,6 @@
 <span class="c-com">// → { feasible, bounded, optimal,</span>
 <span class="c-com">//     variables, tableaux[] }</span>
       </div>
-    </div>
-  </section>
-
-  <!-- 8 · Solver Big-M -->
-  <section class="slide">
-    <div class="eyebrow">El núcleo matemático</div>
-    <h2>Solver Simplex Big-M, escrito a mano</h2>
-    <div class="cols">
-      <ul class="clean">
-        <li><b>Forma estándar automática:</b> ≤ agrega holgura · ≥ agrega exceso + artificial · = agrega artificial.</li>
-        <li><b>Penalización Big-M</b> = 1.000.000 fuerza la salida de las variables artificiales.</li>
-        <li><b>Iteración:</b> entrante por costo reducido más negativo · saliente por razón mínima · pivoteo por operaciones de fila.</li>
-        <li>Detecta <b>infactibilidad</b> y <b>no acotamiento</b>. Sin dependencias externas para la matemática.</li>
-      </ul>
-      <table class="consts">
-        <tr><th>Constante</th><th>Valor</th><th>Uso</th></tr>
-        <tr><td><code>BIG_M</code></td><td>1e6</td><td>Penaliza artificiales</td></tr>
-        <tr><td><code>OPTIMALITY_TOL</code></td><td>1e-9</td><td>Costo reducido neg.</td></tr>
-        <tr><td><code>PIVOT_TOL</code></td><td>1e-9</td><td>Razón mínima</td></tr>
-        <tr><td><code>FEASIBILITY_TOL</code></td><td>1e-6</td><td>Artificial básica</td></tr>
-        <tr><td><code>MAX_ITERATIONS</code></td><td>200</td><td>Anti bucle infinito</td></tr>
-        <tr><td><code>ROUND_DECIMALS</code></td><td>4</td><td>Decimales finales</td></tr>
-      </table>
-    </div>
-  </section>
-
-  <!-- 9 · Persistencia + DB -->
-  <section class="slide">
-    <div class="eyebrow">Persistencia de datos</div>
-    <h2>Base de datos y guardado</h2>
-    <div class="cols">
-      <ul class="clean">
-        <li>El guardado ocurre en <code>onFinish</code> tras cerrar el stream — <b><code>consumeStream()</code></b> asegura que corra aunque el cliente se desconecte.</li>
-        <li>Estrategia <b>delete + re-insert</b> de todos los mensajes: estado consistente ante reintentos.</li>
-        <li>Mensajes guardados como <b>JSONB</b> (texto, imágenes, tool calls y resultados).</li>
-        <li>Índices por <code>(user_id, updated_at)</code> y <code>(chat_id, order)</code> para cargas rápidas.</li>
-      </ul>
-      <div class="codecard">
-<span class="c-com">-- Esquema</span>
-<span class="c-fn">chats</span> ( id <span class="c-key">uuid</span> PK, user_id <span class="c-key">uuid</span> FK,
-        title, created_at, updated_at )
-
-<span class="c-fn">messages</span> ( id <span class="c-key">text</span> PK,
-           chat_id <span class="c-key">uuid</span> FK,
-           role, parts <span class="c-key">jsonb</span>,
-           "order" <span class="c-key">int</span> )
-
-<span class="c-com">-- updated_at vía trigger en cada UPDATE</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 10 · Seguridad -->
-  <section class="slide">
-    <div class="eyebrow">Seguridad</div>
-    <h2>Tres capas de protección</h2>
-    <div class="grid g3">
-      <div class="card"><div class="ico">RLS</div><h3>Row Level Security</h3><p>RLS en toda la base: políticas SELECT/INSERT/UPDATE/DELETE garantizan que cada usuario solo ve y modifica <b>sus propios datos</b> (<code>auth.uid() = user_id</code>).</p></div>
-      <div class="card"><div class="ico">Proxy</div><h3>Middleware de rutas</h3><p><code>proxy.ts</code> verifica la sesión en cada request a <code>/chat/*</code>. Sin sesión válida → <b>redirect a /login</b> antes de procesar la ruta.</p></div>
-      <div class="card"><div class="ico">API</div><h3>API protegida</h3><p><code>/api/chat</code> valida con <code>getUser()</code> antes de procesar; sin usuario responde <b>401</b>. Las claves secretas viven solo en el servidor.</p></div>
     </div>
   </section>
 
@@ -668,7 +593,19 @@
     </div>
   </section>
 
-  <!-- 13 · Cierre -->
+  <!-- 13 · Retrospectiva -->
+  <section class="slide">
+    <div class="eyebrow">Retrospectiva del proyecto</div>
+    <h2>Qué aprendimos<br>en el camino</h2>
+    <div class="grid g2">
+      <div class="card"><div class="ico">Logros</div><h3>Qué funcionó bien</h3><p>La integración entre IA y solver determinista combinó <b>explicación pedagógica</b> con <b>cálculo confiable</b>. Llegamos a un producto funcional y desplegado.</p></div>
+      <div class="card"><div class="ico">Iteración</div><h3>Qué mejoramos</h3><p>Fortalecimos el render matemático, el flujo de confirmación, el historial de chats, la carga de imágenes y la claridad de las respuestas.</p></div>
+      <div class="card"><div class="ico">Desafíos</div><h3>Dificultades</h3><p>Mantener consistencia entre notación, tablas en streaming y la variedad de enunciados, y cubrir todos los casos especiales del Simplex.</p></div>
+      <div class="card"><div class="ico">Equipo</div><h3>Aprendizaje del equipo</h3><p>Un chatbot educativo no debe ser una <b>caja negra</b>: tiene que exponer el modelo, el algoritmo y la interpretación. Sumamos práctica en testing, evaluación y coordinación grupal.</p></div>
+    </div>
+  </section>
+
+  <!-- 14 · Cierre -->
   <section class="slide cover">
     <img class="logo" src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Utn_argentina_logo.png" alt="UTN" onerror="this.onerror=null;this.src='public/utn-logo.png';" />
     <div class="eyebrow">Gracias</div>
@@ -682,6 +619,29 @@
       <div class="member"><div class="nm">Casano, Julieta</div><div class="rl">Producción</div></div>
       <div class="member"><div class="nm">Sotelo, María Celina</div><div class="rl">Testeo</div></div>
     </div>
+  </section>
+
+  <!-- 15 · Flujo (tras la demo: explica la interacción que se acaba de ver) -->
+  <section class="slide">
+    <div class="eyebrow">Cómo funciona</div>
+    <h2>El flujo de una consulta</h2>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><div class="txt">El usuario plantea el problema → <code>useChat</code> hace <b>POST /api/chat</b>.</div></div>
+      <div class="step"><div class="n">2</div><div class="txt">El servidor <b>valida la sesión</b> y hace upsert del chat.</div></div>
+      <div class="step"><div class="n">3</div><div class="txt"><code>gpt-5.5</code> confirma que entendió y pregunta: <b>"¿Lo resuelvo con Simplex?"</b> — todavía no calcula.</div></div>
+      <div class="step"><div class="n">4</div><div class="txt">El usuario confirma → el modelo decide <b>invocar la tool</b> <code>solveSimplex</code> con el problema en JSON.</div></div>
+      <div class="step"><div class="n">5</div><div class="txt"><code>simplex.ts</code> ejecuta Big-M y devuelve <b>los tableaux de cada iteración</b>.</div></div>
+      <div class="step"><div class="n">6</div><div class="txt">El modelo explica iteración por iteración; los tokens llegan por <b>streaming</b> y KaTeX renderiza el LaTeX al vuelo.</div></div>
+      <div class="step"><div class="n">7</div><div class="txt"><code>onFinish</code> <b>persiste todo</b> en Supabase y genera el título con <code>gpt-4.1-mini</code>.</div></div>
+    </div>
+  </section>
+
+  <!-- 16 · Despedida -->
+  <section class="slide cover cover-minimal">
+    <img class="logo" src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Utn_argentina_logo.png" alt="UTN" onerror="this.onerror=null;this.src='public/utn-logo.png';" />
+    <div class="eyebrow">Los Opti-místicos · Investigación Operativa</div>
+    <h1 class="cover-title">Gracias por<br>escucharnos</h1>
+    <p class="lead sub">¿Preguntas?</p>
   </section>
 
 </div>
