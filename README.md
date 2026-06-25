@@ -26,7 +26,7 @@
   | Dominguez, Bruno Ivan | 26.629 | Equipo de desarrollo |
   | Rojas, Alejo Ivan | 27.316 | Scrum Master |
   | Rodríguez Leiva, Juan Ignacio | 28.733 | Product Owner |
-  | Sotelo, María Celina | | Equipo de testeo |
+  | Sotelo, María Celina || Equipo de testeo |
 
   <br />
 
